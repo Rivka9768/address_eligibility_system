@@ -59,10 +59,10 @@ address_eligibility_system/
 │   ├── geocoder_agent.py      # ArcGIS geocoding and statistical area lookup
 │   └── parser_agent.py        # LLM address parsing
 ├── data/                      # Cached Excel files downloaded from CBS
+   ├── test_*.py                  # Validation checks for parsing, flow, geocoding, etc.
 ├── tests/                     # Project test scripts (if present in local setup)
 ├── generate_benchmark.py      # Benchmark/data generation utility
 ├── benchmark_results.xlsx     # Benchmark output example
-├── test_*.py                  # Validation checks for parsing, flow, geocoding, etc.
 └── README.md                  # Project documentation
 ```
 
