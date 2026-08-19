@@ -40,7 +40,7 @@ st.title("🚌 מנוע בדיקת זכאות לפרופיל גיאוגרפי ב
 st.write("אנא הקלד/י את כתובת המגורים שלך")
 
 # קלט מהמשתמש
-raw_address = st.text_input( "",placeholder="למשל: הפלמ\"ח 14 ירוחם")
+raw_address = st.text_input( "כתובת מגורים",placeholder="למשל: הפלמ\"ח 14 ירוחם", label_visibility="collapsed")
 
 if st.button("בדיקת זכאות", type="primary", use_container_width=True):
     if not raw_address.strip():
