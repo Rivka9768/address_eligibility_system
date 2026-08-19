@@ -1,10 +1,10 @@
 # Address Eligibility System
 
-A Streamlit-based system that evaluates whether an address is eligible for a geographic-profile benefit by combining:
+A Streamlit-based system that evaluates whether an address is eligible for the geographic-profile benefit used by the Rav Kav (the public transit card / bus card in Israel) by combining:
 
 - Natural-language address parsing using OpenAI
 - ArcGIS geocoding to locate the address spatially
-- CBS socio-economic and periphery rankings to determine eligibility
+- CBS socio-economic and periphery rankings to determine eligibility for the Rav Kav geographic profile
 - A transparent reasoning output with metadata for each check
 
 Live site:
@@ -12,7 +12,7 @@ https://addresseligibilitysystem-ag5v9woh6cmauzjzzxf2vg.streamlit.app/
 
 ## Overview
 
-This project was built to answer a practical question: given free-text address input in any language, can the system determine whether the address qualifies under Israel's geographic profiling rules?
+This project was built to answer a practical question: given free-text address input in any language, can the system determine whether the address qualifies under Israel's geographic profiling rules for the Rav Kav (the public transit card / bus card in Israel)?
 
 The workflow is:
 
