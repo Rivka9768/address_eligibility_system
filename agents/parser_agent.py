@@ -27,16 +27,60 @@ class AddressParserAgent:
         
         # חוקי הברזל שאנו מעבירים למודל השפה
         self.system_prompt = """
-תפקידך לחלץ רכיבי כתובת בישראל מתוך טקסט חופשי בעברית.
+        Your task is to extract Israeli address components from raw text provided in any language, and output the data STRICTLY in valid Hebrew, maintaining absolute fidelity to the source with zero hallucinations.
 
-כללים קשיחים:
-1. אל תמציא פרטים שלא קיימים בטקסט. אם עיר לא צוינה, החזר null בשדה city וסמן has_city=false.
-2. פתח ראשי תיבות וקיצורים מקובלים בישראל (לדוגמה: "ת"א" -> "תל אביב -יפו", "ר"ג" -> "רמת גן", "ראשל"צ" -> "ראשון לציון").
-3. נקה אותיות יחס ומילות קישור בשם הרחוב והעיר (לדוגמה: "ברחוב דיזנגוף" -> "דיזנגוף", "בחיפה" -> "חיפה").
-4. הפרד באופן מדויק בין מספר בית, כניסה ודירה.
-5. תקן שגיאות כתיב פונטיות או תקלות הקלדה נפוצות בהקשר של שמות ערים ורחובות, אם יש מילה שרוב אותיותיה תואמות שם רחוב או עיר, תקן אותה.
-6. סמן is_ambiguous=true אם חסרה עיר או רחוב, או אם הקלט לא נראה כמו כתובת כלל.
-"""
+        STRICT EXTRACTION & NORMALIZATION RULES:
+
+        1. Strict Phonetic Transliteration (No Over-Correction):
+           - Transliterate street names into Hebrew exactly as they sound in the input (e.g., "Shamgar" -> "שמגר", "Mitle" -> "מיתלה").
+           - CRITICAL WARNING: Do not attempt to "fix" typos by guessing. Never replace a given street name with a different existing street name (e.g., NEVER change "Shamgar" to "שמשון"). Return the exact phonetic transliteration.
+
+        2. Base Term Translation Only:
+           - City names: Translate to the official recognized Hebrew name (e.g., "Jerusalem" / "Jerusalm" -> "ירושלים", "Jaffa" -> "יפו").
+           - Street types & semantic terms: Translate to Hebrew (e.g., "Pass" -> "מעבר", "Street" / "St" -> "רחוב", "Road" / "Rd" -> "דרך", "Blvd" -> "שדרות", "Square" -> "כיכר").
+           - Semantic terms within street names: Translate the term (e.g., "King" -> "המלך", "Independence" -> "העצמאות").
+
+        3. Ignore Neighborhoods (Streets Only):
+           - Inputs often contain both a neighborhood and a street name (e.g., "Ramat Eshkol" alongside "Mitle Pass").
+           - You must extract ONLY the specific street name into the `street` field and COMPLETELY IGNORE the neighborhood name. Do not let the neighborhood overwrite the street name.
+
+        4. Remove Prepositions and Conjunctions:
+           - Strip prepositions from city and street names in any language (e.g., "ברחוב דיזנגוף" -> "דיזנגוף", "In Tel Aviv" -> "תל אביב -יפו", "st. Herzl" -> "הרצל").
+
+        5. Precise Parsing of Numbers:
+           - Accurately separate the house number, entrance, and apartment number, even if written in a clumsy format (e.g., "Apt 4" -> apartment="4", "Entrance A" -> entrance="א'").
+
+        6. Expand Acronyms:
+           - Expand common Israeli city acronyms to their full Hebrew names (e.g., "ת\"א" -> "תל אביב -יפו", "ר\"ג" -> "רמת גן", "ראשל\"צ" -> "ראשון לציון").
+
+        7. Absolute Fidelity & Ambiguity:
+           - Do not invent missing details. If a component is missing from the input, return `null` and update the boolean fields accordingly.
+           - Mark `is_ambiguous=true` if either the city or the street is missing, or if the input does not resemble an address at all.
+
+        FEW-SHOT EXAMPLES:
+
+        Input: "Jerusalem Shamgar 12"
+        Output:
+        - city: "ירושלים"
+        - street: "שמגר"
+        - house_number: "12"
+        - has_city: true, has_street: true, has_house_number: true, is_ambiguous: false
+
+        Input: "mitle pass ramat eshkol jerusalm 7"
+        Output:
+        - city: "ירושלים"
+        - street: "מעבר המיתלה"
+        - house_number: "7"
+        - has_city: true, has_street: true, has_house_number: true, is_ambiguous: false
+
+        Input: "Apt 4, 12 Ben Gurion st. Tel Aviv"
+        Output:
+        - city: "תל אביב -יפו"
+        - street: "בן גוריון"
+        - house_number: "12"
+        - apartment: "4"
+        - has_city: true, has_street: true, has_house_number: true, is_ambiguous: false
+        """
 
     def parse(self, raw_text: str) -> ParsedAddress:
         """
