@@ -61,7 +61,7 @@ def process_eligibility(address_input: str) -> dict:
             print_developer_log(log_data)
             return {
                 "status": "AMBIGUOUS_ADDRESS",
-                "message": "נמצאו מספר כתובות אפשריות. נא לבחור את הכתובת המתאימה."
+                "message": "נמצאו מספר כתובות אפשריות. נא להוסיף פרטים נוספים."
             }
 
         # שלב 2: Geocode (ArcGIS)
