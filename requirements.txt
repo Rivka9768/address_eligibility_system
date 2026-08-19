@@ -1,5 +1,6 @@
-openai
+streamlit
+pandas
+openpyxl
+python-dotenv
 pydantic
 httpx
-python-dotenv
-pandas
