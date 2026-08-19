@@ -11,7 +11,7 @@ load_dotenv()
 
 # הגדרת תצורת העמוד
 st.set_page_config(
-    page_title="מנוע בדיקת זכאות - רשות המסים",
+    page_title="מנוע בדיקת זכאות",
     page_icon="🚌",
     layout="centered"
 )
@@ -36,11 +36,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # כותרת והסבר
-st.title("🚌 מנוע בדיקת זכאות לפרופיל גיאוגרפי")
-st.write("הכניסי כתובת מגורים בשפה חופשית בדיוק כפי שהאזרח מקליד אותה:")
+st.title("🚌 מנוע בדיקת זכאות לפרופיל גיאוגרפי ברב קו")
+st.write("אנא הקלד/י את כתובת המגורים שלך")
 
 # קלט מהמשתמש
-raw_address = st.text_input("כתובת למגורים:", placeholder="למשל: הפלמ\"ח 14 ירוחם")
+raw_address = st.text_input( "",placeholder="למשל: הפלמ\"ח 14 ירוחם")
 
 if st.button("בדיקת זכאות", type="primary", use_container_width=True):
     if not raw_address.strip():
