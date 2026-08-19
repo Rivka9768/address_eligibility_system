@@ -55,22 +55,18 @@ def process_eligibility(address_input: str) -> dict:
         parsed = parser.parse(address_input)
         log_data["parsed_address"] = f"{getattr(parsed, 'street', '')} {getattr(parsed, 'house_number', '')}, {getattr(parsed, 'city', '')}"
         
+        # 9.4 Response - כתובת עמומה / חסרה
+        if parsed.is_ambiguous or not parsed.has_city or not parsed.has_street:
+            log_data["eligibility_result"] = "AMBIGUOUS"
+            print_developer_log(log_data)
+            return {
+                "status": "AMBIGUOUS_ADDRESS",
+                "message": "נמצאו מספר כתובות אפשריות. נא לבחור את הכתובת המתאימה."
+            }
 
         # שלב 2: Geocode (ArcGIS)
         geocoded = geocoder.geocode(parsed)
-        
-        # בתוך process_eligibility, לאחר קריאה ל-geocoder.geocode:
-        if geocoded.is_ambiguous or not geocoded.is_valid:
-            if geocoded.suggestions:
-                return {
-                    "status": "AMBIGUOUS_ADDRESS",
-                    "message": "נמצאו מספר כתובות matching. אנא בחר את הכתובת המבוקשת:",
-                    "suggestions": geocoded.suggestions  # נתונים אמיתיים מ-ArcGIS
-                }
-            return {
-                "status": "ADDRESS_NOT_FOUND",
-                "message": geocoded.error_message or "הכתובת לא נמצאה."
-            }
+
         # 9.5 Response - כתובת לא נמצאה
         if not geocoded.is_valid:
             log_data["eligibility_result"] = "NOT_FOUND"
