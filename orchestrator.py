@@ -26,12 +26,12 @@ def print_developer_log(log_data: dict):
     print(f"4. קואורדינטות (X,Y):    {log_data.get('coords')}")
     print(f"5. סמל יישוב:            {log_data.get('locality_code')}")
     print(f"6. קוד אזור סטטיסטי:     {log_data.get('stat_area')}")
-    print(f"7. אשכול חברתי-כלכלי:    {log_data.get('socio_cluster')}")
-    print(f"8. דירוג פריפריאלי:      {log_data.get('periphery_index')}")
-    print(f"9. תוצאת זכאות:          {log_data.get('eligibility_result')}")
-    print(f"10. שנת נתונים (למ\"ס):   {log_data.get('data_version')}")
+    print(f"7. אשכול אזור סטטיסטי:  {log_data.get('socio_cluster')}")
+    print(f"8. אשכול ברמת היישוב:    {log_data.get('locality_socio_cluster')} ({log_data.get('socio_source')})")
+    print(f"9. דירוג פריפריאלי:      {log_data.get('periphery_index')}")
+    print(f"10. תוצאת זכאות:         {log_data.get('eligibility_result')}")
+    print(f"11. שנת נתונים (למ\"ס):   {log_data.get('data_version')}")
     print("="*55 + "\n")
-
 # ==========================================
 # 2. אורקסטרטור (מנהל את התהליך ומחזיר JSON עסקי)
 # ==========================================
@@ -86,10 +86,15 @@ def process_eligibility(address_input: str) -> dict:
         stat_area = geocoded.statistical_area if geocoded.statistical_area is not None else 0
         res = eligibility_agent.evaluate(geocoded.locality_code, stat_area)
         
-        # חילוץ נתונים מתוך הפלט הישן של agent הזכאות לטובת הלוג של המפתחת
+        # חילוץ מופרד של אשכול האזור, אשכול היישוב ומקור הנתונים
         metadata = res.get("metadata", {})
-        log_data["socio_cluster"] = metadata.get("אשכול_חברתי_כלכלי", "לא ידוע")
-        log_data["periphery_index"] = metadata.get("מדד_פריפריאליות", "לא ידוע")
+        
+        log_data["socio_cluster"] = res.get("socio_cluster", "לא ידוע")
+        log_data["locality_socio_cluster"] = metadata.get("ses_locality", "לא ידוע")
+        log_data["socio_source"] = metadata.get("socio_source", "לא ידוע")
+        log_data["periphery_index"] = res.get("periphery_index", "לא ידוע")
+        
+
         
         # הכרעה סופית
         formatted_addr = getattr(geocoded, 'formatted_address', address_input)
