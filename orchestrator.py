@@ -92,15 +92,24 @@ def process_eligibility(address_input: str) -> dict:
         log_data["periphery_index"] = metadata.get("מדד_פריפריאליות", "לא ידוע")
         
         # הכרעה סופית
+        formatted_addr = getattr(geocoded, 'formatted_address', address_input)
+        
         if res.get("is_eligible", False):
             log_data["eligibility_result"] = "ELIGIBLE"
             print_developer_log(log_data)
-            return {"eligible": True, "status": "ELIGIBLE"}
+            return {
+                "eligible": True, 
+                "status": "ELIGIBLE",
+                "formatted_address": formatted_addr
+            }
         else:
             log_data["eligibility_result"] = "NOT_ELIGIBLE"
             print_developer_log(log_data)
-            return {"eligible": False, "status": "NOT_ELIGIBLE"}
-
+            return {
+                "eligible": False, 
+                "status": "NOT_ELIGIBLE",
+                "formatted_address": formatted_addr
+            }
     except Exception as e:
         # 9.8 Response - נתונים חסרים או שגיאת מערכת חמורה
         log_data["eligibility_result"] = f"SYSTEM_ERROR: {str(e)}"

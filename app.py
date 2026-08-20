@@ -36,20 +36,24 @@ if st.button("בדיקת זכאות", key="check_eligibility_btn", type="primary
     # --- ולידציות של קלט חסר או ארוך מדי ---
     if not address_clean:
         st.error("יש להזין כתובת.")
-        st.stop() # עוצר את המשך הריצה
+        st.stop()
         
     if len(address_clean) > 300:
         st.error("הכתובת יכולה להכיל עד 300 תווים.")
-        st.stop() # עוצר את המשך הריצה
+        st.stop()
 
     # --- הפעלת מנוע הבדיקה ---
     with st.spinner("בודק זכאות במערכת... (נא להמתין)"):
-        # קריאה לאורקסטרטור - בלוגיקה שמתחת לפני השטח הוא גם מדפיס לך לוגים לטרמינל
         final_response = process_eligibility(address_clean)
         
         status = final_response.get("status")
+        formatted_address = final_response.get("formatted_address")
         
         st.divider()
+        
+        # הצגת הכתובת המאומתת במידה שנמצאה
+        if formatted_address and status in ["ELIGIBLE", "NOT_ELIGIBLE"]:
+            st.info(f"📍 **הכתובת שזוהתה במערכת:** {formatted_address}")
         
         # --- תצוגת התוצאה למשתמש ---
         if status == "ELIGIBLE":
@@ -57,5 +61,4 @@ if st.button("בדיקת זכאות", key="check_eligibility_btn", type="primary
         elif status == "NOT_ELIGIBLE":
             st.error("⛔ **לא זכאי. הכתובת אינה זכאית להטבה.**")
         else:
-            # מקרים כמו: כתובת לא נמצאה, עמומה מידי, או שגיאת מערכת
             st.warning(f"⚠️ {final_response.get('message', 'שגיאה בתהליך')}")
